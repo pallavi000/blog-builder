@@ -1,10 +1,10 @@
-import { signOut, useSession } from "next-auth/react";
+import { getSession, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
 
 function Navbar() {
   const { data: session, status } = useSession();
-  console.log(session, status);
+
   return (
     <div className="flex justify-between items-center bg-gray-800 text-white text-lg py-4 px-4">
       <div className="flex items-center gap-4">

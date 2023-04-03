@@ -1,10 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import heroImg from "../../images/hero.jpeg";
 import Image from "next/image";
 import Link from "next/link";
+import { getSession } from "next-auth/react";
+import Blog from "../../../models/Blog";
+import dbConnect from "../../../utils/dbConnect";
 
-function index() {
-  const arr = [1, 2, 3, 4, 5, 6, 7, 8];
+function index(props) {
+  console.log(props.data, "seeee");
+  const blogs = props.data;
+
   return (
     <div className="p-10 w-full">
       <div className="font-medium text-5xl align-middle w-1/3 font-serif mb-20">
@@ -15,11 +20,17 @@ function index() {
           Recommended starting points
         </div>
         <div className="grid grid-cols-4 gap-8 ">
-          {arr.map((a) => {
+          {blogs.map((blog) => {
             return (
-              <div className="shadow-md rounded-md p-8 h-48 bg-red-200 flex justify-center ">
-                <div>START WITH HAWLEY </div>
-              </div>
+              <Link
+                href={`/blog/${blog._id}`}
+                className="shadow-md rounded-md p-8 h-48 bg-red-200 flex justify-center flex-col gap-1 "
+              >
+                <div className="font-medium text-lg  hover:translate-x-0 ease-in-out duration-300">
+                  {blog.title}{" "}
+                </div>
+                <div className="line-clamp-1">{blog.body}</div>
+              </Link>
             );
           })}
         </div>
@@ -34,6 +45,7 @@ function index() {
             create a website template that matches your vision.
           </div>
           <Link
+          {}
             href="/blog/create"
             className="bg-white py-3 px-6 w-fit text-black text-sm  mt-16 font-sans flex gap-2 cursor-pointer"
           >
@@ -50,3 +62,16 @@ function index() {
 }
 
 export default index;
+
+export async function getServerSideProps(context) {
+  await dbConnect();
+
+  let blogs = await Blog.find().lean();
+  let serializedBlogs = JSON.parse(JSON.stringify(blogs));
+
+  return {
+    props: {
+      data: serializedBlogs,
+    },
+  };
+}

@@ -16,9 +16,8 @@ function login() {
         redirect: false,
       });
       router.push("/");
-      console.log(res);
     } catch (error) {
-      console.log(error);
+      console.log(error, "errrrr");
     }
   };
 

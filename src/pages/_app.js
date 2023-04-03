@@ -6,7 +6,7 @@ import "react-quill/dist/quill.snow.css";
 export default function App({ Component, pageProps }) {
   return (
     <SessionProvider session={pageProps.session}>
-      <Navbar />
+      <Navbar {...pageProps} />
       <Component {...pageProps} />
     </SessionProvider>
   );

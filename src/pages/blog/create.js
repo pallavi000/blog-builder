@@ -1,6 +1,8 @@
 import React, { useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { getSession, useSession } from "next-auth/react";
+import axios from "axios";
+import { useRouter } from "next/router";
 
 const QuillNoSSRWrapper = dynamic(import("react-quill"), {
   ssr: false,
@@ -48,21 +50,31 @@ const formats = [
 ];
 
 function create(props) {
-  console.log(props, "......................");
   const [title, setTitle] = useState("");
   const [subTitle, setSubTitle] = useState("");
   const [body, setBody] = useState("");
   const { data: session, status } = useSession();
   console.log(session, status);
 
-  const createBlog = (e) => {
+  const router = useRouter();
+  const createBlog = async (e) => {
     e.preventDefault();
     const data = {
       title,
-      subTitle,
+      subtitle: subTitle,
       body: body.replace(/<[^>]+>/g, ""),
+      user_id: props.data.user.id,
     };
+
     console.log(data);
+    try {
+      console.log("api call");
+      const res = await axios.post("/api/blog", data);
+      console.log(res.data, "......data entry");
+      router.push("/blog");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -120,13 +132,15 @@ function create(props) {
 
 export default create;
 
-export async function getServerSideRender(context) {
-  const session = await getSession(context);
-  console.log(session, "session");
-
+export async function getServerSideProps(context) {
+  let session = await getSession(context);
+  console.log(session, "sessionttttt");
+  session = {
+    ...session,
+  };
   return {
     props: {
-      data: session.user.id,
+      data: session,
     },
   };
 }

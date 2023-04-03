@@ -4,9 +4,6 @@ import User from "../../../../models/User";
 import dbConnect from "../../../../utils/dbConnect";
 
 export const authOption = {
-  session: {
-    strategy: "jwt",
-  },
   providers: [
     CredentialsProvider({
       type: "credentials",
@@ -16,15 +13,32 @@ export const authOption = {
         console.log(email, password);
         await dbConnect();
         const user = await User.findOne({ email: credentials.email });
-        console.log(user, "wwwwwwwwwwwwwwwwww");
+
         if (email == user.email && password == user.password) {
-          return { id: user._id, email: user.email, name: user.name };
+          console.log(user, "............................................");
+          return {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+          };
         } else {
           throw new Error("User not found");
         }
       },
     }),
   ],
+  callbacks: {
+    async session({ session, token }) {
+      session.user = token.user;
+      return session;
+    },
+    async jwt({ token, user }) {
+      if (user) {
+        token.user = user;
+      }
+      return token;
+    },
+  },
   pages: { signIn: "/auth/login" },
 };
 
